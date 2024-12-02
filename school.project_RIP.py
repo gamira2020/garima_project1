@@ -23,16 +23,30 @@ while True:
     elif select_choice == "2":
         try:
             customers=pd.read_csv("customers.csv")
+            stock = pd.read_csv("stock.csv")
         except FileNotFoundError:
             customers=pd.DataFrame(columns=['Customer','Item','Quantity','City'])
             customers.to_csv("customers.csv",index=False)
+            stock = pd.DataFrame(columns=['Item', 'Quantity', 'Price per Item'])
+            stock.to_csv("stock.csv", index=False)
         u_name=input("enter customer name: ")
         u_item=input('enter electronic item: ')
-        customer_purchased_quantity=input('enter purchased quantity: ')
+        customer_purchased_quantity=int(input('enter purchased quantity: '))
         u_city=input('enter city: ')
-        customers.loc[len(customers)] = [u_name, u_item, customer_purchased_quantity, u_city]
-        customers.to_csv("customers.csv",index=False)
-        print(u_name,'and their order details are added.')
+        selected_item=stock.loc[stock['Item']==u_item]
+        stock_quantity = selected_item['Quantity'].values.sum()
+        # WIP item filter done , customer filter left
+        if selected_item.empty == False:
+            if customer_purchased_quantity <= stock_quantity:
+                stock.loc[selected_item.index, 'Quantity'] = stock_quantity - customer_purchased_quantity
+                customers.loc[len(customers)] = [u_name, u_item, customer_purchased_quantity, u_city]
+                customers.to_csv("customers.csv",index=False)
+                stock.to_csv("stock.csv", index=False)
+                print(u_name,'and their order details are added.')
+            else:
+                print(customer_purchased_quantity,"no. of ",u_item,"\bs are not available.")
+        else:
+            print(u_item,"Stock not available for purchase currently.")
     elif select_choice == "3":
         print("Which Data do you want to view:")
         print("1.Stock Details")
