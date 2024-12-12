@@ -1,12 +1,14 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 while True:
-    print("what do you want to do:")
+    print("Select a Choice:")
     print("1.Add Electronic Item")
     print("2.Add Customer Orders")
     print("3.Show Stock and Customer Data")
     print("4.Delete an Item")
-    print("5.Exit")
+    print("5.Show Graph")
+    print("6.Exit")
     select_choice = input("enter choice: ")
     if select_choice == "1":
         try:
@@ -35,7 +37,6 @@ while True:
         u_city=input('enter city: ')
         selected_item=stock.loc[stock['Item']==u_item]
         stock_quantity = selected_item['Quantity'].values.sum()
-        # WIP item filter done , customer filter left
         if selected_item.empty == False:
             if customer_purchased_quantity <= stock_quantity:
                 stock.loc[selected_item.index, 'Quantity'] = stock_quantity - customer_purchased_quantity
@@ -44,9 +45,9 @@ while True:
                 stock.to_csv("stock.csv", index=False)
                 print(u_name,'and their order details are added.')
             else:
-                print(customer_purchased_quantity,"no. of ",u_item,"\bs are not available.")
+                print(customer_purchased_quantity,"no. of",u_item,"\bs are not available.")
         else:
-            print(u_item,"Stock not available for purchase currently.")
+            print("Stock of",u_item," is not available for purchase currently.")
     elif select_choice == "3":
         print("Which Data do you want to view:")
         print("1.Stock Details")
@@ -93,5 +94,17 @@ while True:
             print(u_item,"and its details are deleted.")
         else:
             print(u_item,"doesn't exist in data.")
+    elif select_choice == "5":
+        try:
+            stock=pd.read_csv("stock.csv")
+            print("Graph for Items vs Prices:")
+            plt.bar(stock['Item'],stock['Price per Item'],color="lime",edgecolor='blue',linestyle="dashdot",linewidth=2,)
+            plt.title("Graph for Items vs Prices:")
+            plt.xlabel("Item")
+            plt.ylabel("Price")
+            plt.show()
+        except FileNotFoundError:
+            stock = pd.read_csv("stock.csv")
+            print(stock,"DataFrame doesn't exist.")
     else:
         break
